@@ -306,7 +306,7 @@ export default function RepoWikiPage() {
 
     // Fallback to just the file path
     return filePath;
-  }, [effectiveRepoInfo, defaultBranch, forceRefetch]);
+  }, [effectiveRepoInfo, defaultBranch]);
 
   // Memoize repo info to avoid triggering updates in callbacks
 
