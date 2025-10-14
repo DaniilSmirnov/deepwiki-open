@@ -412,7 +412,7 @@ def get_wiki_repo_path(owner: str, repo: str) -> str:
 
 # --- Wiki Databases Helper Functions ---
 WIKI_DATABASE_DIR = os.path.join(get_adalflow_default_root_path(), "databases")
-os.makedirs(WIKI_REPOS_DIR, exist_ok=True)
+os.makedirs(WIKI_DATABASE_DIR, exist_ok=True)
 
 def get_wiki_database_path(owner: str, repo: str) -> str:
     filename = f"{owner}_{repo}.pkl"
