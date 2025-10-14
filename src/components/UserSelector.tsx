@@ -375,7 +375,7 @@ export default function UserSelector({
               id="is-need-refetch"
               checked={forceRefetch}
               onChange={setForceRefetch}
-              label={t.form?.needRefetchRepo || 'Force refetch repo'}
+              label={t.form?.needRefetchRepo || 'Force refetch repository'}
           />
 
           {supportsCustomModel && (
