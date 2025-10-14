@@ -306,7 +306,7 @@ export default function RepoWikiPage() {
 
     // Fallback to just the file path
     return filePath;
-  }, [effectiveRepoInfo, defaultBranch]);
+  }, [effectiveRepoInfo, defaultBranch, forceRefetch]);
 
   // Memoize repo info to avoid triggering updates in callbacks
 
@@ -1659,7 +1659,7 @@ IMPORTANT:
     // For now, we rely on the standard loadData flow initiated by resetting effectRan and dependencies.
     // This will re-trigger the main data loading useEffect.
     // No direct call to fetchRepositoryStructure here, let the useEffect handle it based on effectRan.current = false.
-  }, [effectiveRepoInfo, language, messages.loading, activeContentRequests, selectedProviderState, selectedModelState, isCustomSelectedModelState, customSelectedModelState, modelExcludedDirs, modelExcludedFiles, isComprehensiveView, authCode, authRequired]);
+  }, [forceRefetch, effectiveRepoInfo, language, messages.loading, activeContentRequests, selectedProviderState, selectedModelState, isCustomSelectedModelState, customSelectedModelState, modelExcludedDirs, modelExcludedFiles, isComprehensiveView, authCode, authRequired]);
 
   // Start wiki generation when component mounts
   useEffect(() => {

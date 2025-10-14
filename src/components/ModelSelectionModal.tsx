@@ -92,7 +92,6 @@ export default function ModelSelectionModal({
   const [localExcludedFiles, setLocalExcludedFiles] = useState(excludedFiles);
   const [localIncludedDirs, setLocalIncludedDirs] = useState(includedDirs);
   const [localIncludedFiles, setLocalIncludedFiles] = useState(includedFiles);
-  const [localForceRefetch, setLocalForceRefetch] = useState(forceRefetch);
   
   // Token input state
   const [localAccessToken, setLocalAccessToken] = useState('');
@@ -128,7 +127,6 @@ export default function ModelSelectionModal({
     if (setExcludedFiles) setExcludedFiles(localExcludedFiles);
     if (setIncludedDirs) setIncludedDirs(localIncludedDirs);
     if (setIncludedFiles) setIncludedFiles(localIncludedFiles);
-    if (setForceRefetch) setForceRefetch(localForceRefetch);
     
     // Pass token to onApply if needed
     if (showTokenInput) {
@@ -193,8 +191,8 @@ export default function ModelSelectionModal({
               setIncludedDirs={showFileFilters ? (value: string) => setLocalIncludedDirs(value) : undefined}
               includedFiles={localIncludedFiles}
               setIncludedFiles={showFileFilters ? (value: string) => setLocalIncludedFiles(value) : undefined}
-              forceRefetch={localForceRefetch}
-              setForceRefetch={setLocalForceRefetch}
+              forceRefetch={forceRefetch}
+              setForceRefetch={setForceRefetch}
             />
 
             {/* Token Input Section for refresh */}
