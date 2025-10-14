@@ -558,12 +558,11 @@ async def delete_wiki_cache(
             logger.info(f"Successfully deleted wiki cache: {cache_path}")
             return {"message": f"Wiki cache for {owner}/{repo} ({language}) deleted successfully"}
         except Exception as e:
+            logger.error(f"Error during deletion for {owner}/{repo} ({language}): {e}")
+            detail = "Failed to delete wiki cache"
             if force_refetch:
-                logger.error(f"Error deleting repository and database {cache_path}: {e}")
-                raise HTTPException(status_code=500, detail=f"Failed to delete wiki cache, repository and database: {str(e)}")
-            else:
-                logger.error(f"Error deleting wiki cache {cache_path}: {e}")
-                raise HTTPException(status_code=500, detail=f"Failed to delete wiki cache: {str(e)}")
+                detail += ", repository and database"
+            raise HTTPException(status_code=500, detail=f"{detail}: {str(e)}")
     else:
         logger.warning(f"Wiki cache not found, cannot delete: {cache_path}")
         raise HTTPException(status_code=404, detail="Wiki cache not found")

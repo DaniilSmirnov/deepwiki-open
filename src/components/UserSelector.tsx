@@ -188,26 +188,47 @@ const Toggle: React.FC<{
   checked: boolean;
   onChange: (next: boolean) => void;
   label: string;
-}> = ({ id, checked, onChange, label }) => (
+  className?: string;
+}> = ({ id, checked, onChange, label, className }) => (
     <div className="mb-2">
-      <div className="flex items-center pb-1">
+      <div className="flex items-center gap-2 pb-1">
         <button
+            id={id}
             type="button"
-            aria-pressed={checked}
+            role="switch"
+            aria-checked={checked}
+            aria-labelledby={`${id}-label`}
             onClick={() => onChange(!checked)}
-            className="relative flex items-center cursor-pointer select-none"
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                onChange(!checked);
+              }
+            }}
+            className={[
+              'relative inline-flex h-5 w-10 items-center rounded-full transition-colors focus:outline-none focus-visible:ring focus-visible:ring-[var(--accent-primary)]',
+              className || ''
+            ].join(' ')}
+            data-state={checked ? 'on' : 'off'}
         >
-          <span className="sr-only">{label}</span>
-          <span className={`w-10 h-5 rounded-full transition-colors ${checked ? 'bg-[var(--accent-primary)]' : 'bg-gray-300 dark:bg-gray-600'}`} />
-          <span className={`absolute left-0.5 top-0.5 w-4 h-4 rounded-full bg-white transition-transform transform ${checked ? 'translate-x-5' : ''}`} />
+          {/* Track */}
+          <span
+              aria-hidden
+              className={`absolute inset-0 rounded-full ${checked ? 'bg-[var(--accent-primary)]' : 'bg-gray-300 dark:bg-gray-600'}`}
+          />
+          {/* Thumb */}
+          <span
+              aria-hidden
+              className={`absolute left-0.5 top-0.5 h-4 w-4 rounded-full bg-white transition-transform transform ${checked ? 'translate-x-5' : ''}`}
+          />
         </button>
-        <button
-            type="button"
-            className="ml-2 text-sm font-medium text-[var(--muted)] cursor-pointer"
+        <label
+            id={`${id}-label`}
+            className="text-sm font-medium text-[var(--muted)] cursor-pointer"
             onClick={() => onChange(!checked)}
         >
           {label}
-        </button>
+        </label>
       </div>
     </div>
 );
@@ -375,7 +396,7 @@ export default function UserSelector({
               id="is-need-refetch"
               checked={forceRefetch}
               onChange={setForceRefetch}
-              label={t.form?.needRefetchRepo || 'Force refetch repository'}
+              label={t.form?.needRefetchRepo || 'Force refetch repo'}
           />
 
           {supportsCustomModel && (
