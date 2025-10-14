@@ -30,6 +30,8 @@ interface ModelSelectorProps {
   setIsCustomModel: (value: boolean) => void;
   customModel: string;
   setCustomModel: (value: string) => void;
+  forceRefetch: boolean;
+  setForceRefetch: (forceRefetch: boolean) => void;
 
   // File filter configuration
   showFileFilters?: boolean;
@@ -52,6 +54,8 @@ export default function UserSelector({
   setIsCustomModel,
   customModel,
   setCustomModel,
+  forceRefetch,
+  setForceRefetch,
 
   // File filter configuration
   showFileFilters = false,
@@ -329,6 +333,45 @@ next.config.js
               )) || <option value="">{t.form?.selectModel || 'Select Model'}</option>}
             </select>
           )}
+        </div>
+
+        <div className="mb-2">
+          <div className="flex items-center pb-1">
+            <div
+                className="relative flex items-center cursor-pointer"
+                onClick={() => {
+                  const newValue = !forceRefetch;
+                  setForceRefetch(newValue);
+                  if (newValue) {
+                    setForceRefetch(true);
+                  }
+                }}
+            >
+              <input
+                  id="is-need-refetch"
+                  type="checkbox"
+                  checked={forceRefetch}
+                  onChange={() => {}}
+                  className="sr-only"
+              />
+              <div className={`w-10 h-5 rounded-full transition-colors ${forceRefetch ? 'bg-[var(--accent-primary)]' : 'bg-gray-300 dark:bg-gray-600'}`}></div>
+              <div className={`absolute left-0.5 top-0.5 w-4 h-4 rounded-full bg-white transition-transform transform ${forceRefetch ? 'translate-x-5' : ''}`}></div>
+            </div>
+            <label
+                htmlFor="is-need-refetch"
+                className="ml-2 text-sm font-medium text-[var(--muted)] cursor-pointer"
+                onClick={(e) => {
+                  e.preventDefault();
+                  const newValue = !forceRefetch;
+                  setForceRefetch(newValue);
+                  if (newValue) {
+                    setForceRefetch(true);
+                  }
+                }}
+            >
+              {t.form?.needRefetchRepo || 'Force refetch repo'}
+            </label>
+          </div>
         </div>
 
         {/* Custom model toggle - only when provider supports it */}

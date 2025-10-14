@@ -245,7 +245,7 @@ export default function RepoWikiPage() {
   const includedFiles = searchParams.get('included_files') || '';
   const [modelIncludedDirs, setModelIncludedDirs] = useState(includedDirs);
   const [modelIncludedFiles, setModelIncludedFiles] = useState(includedFiles);
-
+  const [forceRefetch, setForceRefetch] = useState(false);
 
   // Wiki type state - default to comprehensive view
   const isComprehensiveParam = searchParams.get('comprehensive') !== 'false';
@@ -1562,6 +1562,7 @@ IMPORTANT:
         is_custom_model: isCustomSelectedModelState.toString(),
         custom_model: customSelectedModelState,
         comprehensive: isComprehensiveView.toString(),
+        force_refetch: forceRefetch.toString(),
         authorization_code: authCode,
       });
 
@@ -2248,6 +2249,8 @@ IMPORTANT:
         authCode={authCode}
         setAuthCode={setAuthCode}
         isAuthLoading={isAuthLoading}
+        forceRefetch={forceRefetch}
+        setForceRefetch={setForceRefetch}
       />
     </div>
   );

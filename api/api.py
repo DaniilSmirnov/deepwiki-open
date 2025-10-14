@@ -400,6 +400,23 @@ app.add_api_route("/chat/completions/stream", chat_completions_stream, methods=[
 # Add the WebSocket endpoint
 app.add_websocket_route("/ws/chat", handle_websocket_chat)
 
+# --- Wiki Repo Helper Functions ---
+WIKI_REPOS_DIR = os.path.join(get_adalflow_default_root_path(), "repos")
+os.makedirs(WIKI_REPOS_DIR, exist_ok=True)
+
+def get_wiki_repo_path(owner: str, repo: str) -> str:
+    filename = f"{owner}_{repo}"
+    return os.path.join(WIKI_REPOS_DIR, filename)
+
+
+# --- Wiki Databases Helper Functions ---
+WIKI_DATABASE_DIR = os.path.join(get_adalflow_default_root_path(), "databases")
+os.makedirs(WIKI_REPOS_DIR, exist_ok=True)
+
+def get_wiki_database_path(owner: str, repo: str) -> str:
+    filename = f"{owner}_{repo}.pkl"
+    return os.path.join(WIKI_DATABASE_DIR, filename)
+
 # --- Wiki Cache Helper Functions ---
 
 WIKI_CACHE_DIR = os.path.join(get_adalflow_default_root_path(), "wikicache")
@@ -507,7 +524,8 @@ async def delete_wiki_cache(
     repo: str = Query(..., description="Repository name"),
     repo_type: str = Query(..., description="Repository type (e.g., github, gitlab)"),
     language: str = Query(..., description="Language of the wiki content"),
-    authorization_code: Optional[str] = Query(None, description="Authorization code")
+    authorization_code: Optional[str] = Query(None, description="Authorization code"),
+    force_refetch: bool = Query(False, description="Force re-clone the repository")
 ):
     """
     Deletes a specific wiki cache from the file system.
@@ -527,15 +545,29 @@ async def delete_wiki_cache(
 
     if os.path.exists(cache_path):
         try:
-            os.remove(cache_path)
-            logger.info(f"Successfully deleted wiki cache: {cache_path}")
-            return {"message": f"Wiki cache for {owner}/{repo} ({language}) deleted successfully"}
+            if not force_refetch:
+                os.remove(cache_path)
+                logger.info(f"Successfully deleted wiki cache: {cache_path}")
+                return {"message": f"Wiki cache for {owner}/{repo} ({language}) deleted successfully"}
+            else:
+                repo_dir = get_wiki_repo_path(owner, repo)
+                database_file = get_wiki_database_path(owner, repo)
+                os.remove(repo_dir)
+                os.remove(database_file)
+                logger.info(f"Wiki cache, repository and database for {owner}/{repo} ({language}) deleted successfully")
+                return {"message": f"Wiki cache, repository and database for {owner}/{repo} ({language}) deleted successfully"}
         except Exception as e:
-            logger.error(f"Error deleting wiki cache {cache_path}: {e}")
-            raise HTTPException(status_code=500, detail=f"Failed to delete wiki cache: {str(e)}")
+            if not force_refetch:
+                logger.error(f"Error deleting wiki cache {cache_path}: {e}")
+                raise HTTPException(status_code=500, detail=f"Failed to delete wiki cache: {str(e)}")
+            else:
+                logger.error(f"Error deleting wiki cache, repository and database {cache_path}: {e}")
+                raise HTTPException(status_code=500, detail=f"Failed to delete wiki cache with force refresh: {str(e)}")
     else:
         logger.warning(f"Wiki cache not found, cannot delete: {cache_path}")
         raise HTTPException(status_code=404, detail="Wiki cache not found")
+
+
 
 @app.get("/health")
 async def health_check():
