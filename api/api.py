@@ -1,4 +1,5 @@
 import os
+import shutil
 import logging
 from fastapi import FastAPI, HTTPException, Query, Request, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
@@ -545,24 +546,24 @@ async def delete_wiki_cache(
 
     if os.path.exists(cache_path):
         try:
-            if not force_refetch:
-                os.remove(cache_path)
-                logger.info(f"Successfully deleted wiki cache: {cache_path}")
-                return {"message": f"Wiki cache for {owner}/{repo} ({language}) deleted successfully"}
-            else:
+            if force_refetch:
                 repo_dir = get_wiki_repo_path(owner, repo)
                 database_file = get_wiki_database_path(owner, repo)
-                os.remove(repo_dir)
-                os.remove(database_file)
+                if os.path.exists(repo_dir):
+                    shutil.rmtree(repo_dir)
+                if os.path.exists(database_file):
+                    os.remove(database_file)
                 logger.info(f"Wiki cache, repository and database for {owner}/{repo} ({language}) deleted successfully")
-                return {"message": f"Wiki cache, repository and database for {owner}/{repo} ({language}) deleted successfully"}
+            os.remove(cache_path)
+            logger.info(f"Successfully deleted wiki cache: {cache_path}")
+            return {"message": f"Wiki cache for {owner}/{repo} ({language}) deleted successfully"}
         except Exception as e:
-            if not force_refetch:
+            if force_refetch:
+                logger.error(f"Error deleting repository and database {cache_path}: {e}")
+                raise HTTPException(status_code=500, detail=f"Failed to delete wiki cache, repository and database: {str(e)}")
+            else:
                 logger.error(f"Error deleting wiki cache {cache_path}: {e}")
                 raise HTTPException(status_code=500, detail=f"Failed to delete wiki cache: {str(e)}")
-            else:
-                logger.error(f"Error deleting wiki cache, repository and database {cache_path}: {e}")
-                raise HTTPException(status_code=500, detail=f"Failed to delete wiki cache with force refresh: {str(e)}")
     else:
         logger.warning(f"Wiki cache not found, cannot delete: {cache_path}")
         raise HTTPException(status_code=404, detail="Wiki cache not found")
