@@ -192,7 +192,15 @@ export default function RepoWikiPage() {
   const isCustomModelParam = searchParams.get('is_custom_model') === 'true';
   const customModelParam = searchParams.get('custom_model') || '';
   const language = searchParams.get('language') || 'en';
-  const repoHost = repoUrl ? new URL(repoUrl).hostname.toLowerCase() : '';
+  const repoHost = (() => {
+    if (!repoUrl) return '';
+    try {
+      return new URL(repoUrl).hostname.toLowerCase();
+    } catch (e) {
+      console.warn(`Invalid repoUrl provided: ${repoUrl}`);
+      return '';
+    }
+  })();
   const repoType = repoHost?.includes('bitbucket')
     ? 'bitbucket'
     : repoHost?.includes('gitlab')
