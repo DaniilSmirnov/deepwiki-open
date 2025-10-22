@@ -698,7 +698,7 @@ def get_file_content(repo_url: str, file_path: str, repo_type: str = None, acces
     elif repo_type == "bitbucket":
         return get_bitbucket_file_content(repo_url, file_path, access_token)
     else:
-        raise ValueError("Unsupported repository URL. Only GitHub and GitLab are supported.")
+        raise ValueError("Unsupported repository type. Only GitHub, GitLab, and Bitbucket are supported.")
 
 class DatabaseManager:
     """
