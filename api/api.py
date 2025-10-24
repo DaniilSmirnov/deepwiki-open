@@ -1,3 +1,4 @@
+import asyncio
 import os
 import logging
 from fastapi import FastAPI, HTTPException, Query, Request, WebSocket
@@ -35,6 +36,10 @@ app.add_middleware(
 # Helper function to get adalflow root path
 def get_adalflow_default_root_path():
     return os.path.expanduser(os.path.join("~", ".adalflow"))
+
+async def awalk_collect(path: str):
+    # Вернёт list[(root, dirs, files)]
+    return await asyncio.to_thread(lambda: list(os.walk(path)))
 
 # --- Pydantic Models ---
 class WikiPage(BaseModel):
@@ -293,7 +298,7 @@ async def get_local_repo_structure(path: str = Query(None, description="Path to 
         file_tree_lines = []
         readme_content = ""
 
-        for root, dirs, files in os.walk(path):
+        for root, dirs, files in await awalk_collect(path):
             # Exclude hidden dirs/files and virtual envs
             dirs[:] = [d for d in dirs if not d.startswith('.') and d != '__pycache__' and d != 'node_modules' and d != '.venv']
             for file in files:
